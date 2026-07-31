@@ -1,9 +1,9 @@
 /*
 ================================================
 
-LXY SPACE
+bieudhbswot22-splace21676816
 
-Quote Random System
+Random Quote System
 
 随机句子系统
 
@@ -13,31 +13,21 @@ Quote Random System
 
 import {
 
-    addData,
-    getAllData,
-    deleteData,
-    STORES
+    saveGameData,
+    getGameData
 
 } from "./storage.js";
 
 
 
 
-
-/*
-================================================
-
-变量
-
-================================================
-*/
+let container=null;
 
 
-let quoteDatabase = [];
+let favorites=[];
 
-let currentQuote = null;
 
-let favoriteQuotes = [];
+let history=[];
 
 
 
@@ -46,20 +36,224 @@ let favoriteQuotes = [];
 
 
 
-/*
-================================================
 
-加载句子数据库
-
-来源：
-
-data/quotes.json
-
-================================================
-*/
+async function loadData(){
 
 
-async function loadQuotes(){
+
+    favorites =
+    await getGameData(
+        "quote-favorites"
+    )
+    ||
+    [];
+
+
+
+    history =
+    await getGameData(
+        "quote-history"
+    )
+    ||
+    [];
+
+
+
+}
+
+
+
+
+
+
+
+
+
+async function saveData(){
+
+
+
+    await saveGameData(
+
+        "quote-favorites",
+
+        favorites
+
+    );
+
+
+
+    await saveGameData(
+
+        "quote-history",
+
+        history
+
+    );
+
+
+
+}
+
+
+
+
+
+
+
+
+
+async function getRandomQuote(){
+
+
+
+    const sources=[
+
+
+
+        async()=>{
+
+
+            const res =
+            await fetch(
+
+                "https://api.quotable.io/random"
+
+            );
+
+
+            const data =
+            await res.json();
+
+
+
+            return {
+
+
+                text:
+                data.content,
+
+
+                author:
+                data.author,
+
+
+                language:
+                "English"
+
+
+            };
+
+
+        },
+
+
+
+
+        async()=>{
+
+
+            const res =
+            await fetch(
+
+                "https://v1.hitokoto.cn/"
+
+            );
+
+
+
+            const data =
+            await res.json();
+
+
+
+            return {
+
+
+                text:
+                data.hitokoto,
+
+
+                author:
+                data.from
+                ||
+                "未知",
+
+
+                language:
+                "中文"
+
+
+            };
+
+
+        }
+
+
+
+    ];
+
+
+
+
+
+    const random =
+    sources[
+        Math.floor(
+            Math.random()
+            *
+            sources.length
+        )
+    ];
+
+
+
+    try{
+
+
+        return await random();
+
+
+    }
+
+
+    catch{
+
+
+        return {
+
+
+            text:
+            "Every moment is a new beginning.",
+
+
+            author:
+            "Unknown",
+
+
+            language:
+            "English"
+
+
+        };
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+async function translate(text){
+
 
 
     try{
@@ -67,33 +261,35 @@ async function loadQuotes(){
 
         const response =
         await fetch(
-            "./data/quotes.json"
+
+            "https://api.mymemory.translated.net/get?q="
+            +
+            encodeURIComponent(text)
+            +
+            "&langpair=en|zh"
+
         );
 
 
-        quoteDatabase =
+
+        const data =
         await response.json();
 
 
 
-        console.log(
-            "Quotes loaded:",
-            quoteDatabase.length
-        );
+        return data
+        .responseData
+        .translatedText;
+
 
 
     }
 
-    catch(error){
+
+    catch{
 
 
-        console.error(
-            "Quote loading failed:",
-            error
-        );
-
-
-        quoteDatabase = [];
+        return "翻译失败";
 
 
     }
@@ -110,82 +306,58 @@ async function loadQuotes(){
 
 
 
-/*
-================================================
-
-真正随机算法
-
-================================================
-*/
-
-
-function randomQuote(){
-
-
-    if(
-        quoteDatabase.length===0
-    ){
-
-        return null;
-
-    }
-
-
-
-    const index =
-    Math.floor(
-        Math.random()
-        *
-        quoteDatabase.length
-    );
-
-
-
-    return quoteDatabase[index];
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-生成随机句子
-
-================================================
-*/
-
-
-async function generateQuote(){
+async function generate(){
 
 
 
     const quote =
-    randomQuote();
+    await getRandomQuote();
 
 
 
-    if(!quote){
 
-        return;
+    if(
+        quote.language==="English"
+    ){
+
+
+        quote.translation =
+        await translate(
+            quote.text
+        );
+
 
     }
 
 
 
-    currentQuote =
-    quote;
+    history.unshift(
+        {
+
+            ...quote,
+
+            time:
+            new Date()
+            .toLocaleString()
+
+        }
+    );
 
 
 
-    displayQuote(
+    history =
+    history.slice(
+        0,
+        50
+    );
+
+
+
+    await saveData();
+
+
+
+    renderQuote(
         quote
     );
 
@@ -200,119 +372,16 @@ async function generateQuote(){
 
 
 
-/*
-================================================
+function favorite(){
 
-显示到页面
 
-================================================
-*/
 
+    const current =
+    history[0];
 
-function displayQuote(
-    quote
-){
 
 
-    const text =
-    document.getElementById(
-        "quote-text"
-    );
-
-
-
-    const info =
-    document.getElementById(
-        "quote-info"
-    );
-
-
-
-
-    if(text){
-
-
-        text.innerHTML =
-        quote.text;
-
-
-    }
-
-
-
-
-    if(info){
-
-
-        let result = "";
-
-
-
-        if(quote.author){
-
-            result +=
-            quote.author;
-
-        }
-
-
-
-        if(quote.language){
-
-            result +=
-            " · "
-            +
-            quote.language;
-
-        }
-
-
-
-        if(quote.translation){
-
-
-            result +=
-            "<br>"
-            +
-            quote.translation;
-
-
-        }
-
-
-
-        info.innerHTML =
-        result;
-
-
-    }
-
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-收藏系统
-
-================================================
-*/
-
-
-async function favoriteCurrentQuote(){
-
-
-
-    if(!currentQuote){
+    if(!current){
 
         return;
 
@@ -320,44 +389,13 @@ async function favoriteCurrentQuote(){
 
 
 
-
-    await addData(
-        STORES.quotes,
-        {
-
-
-            text:
-            currentQuote.text,
-
-
-            language:
-            currentQuote.language,
-
-
-            author:
-            currentQuote.author || "",
-
-
-            translation:
-            currentQuote.translation || "",
-
-
-            time:
-            Date.now()
-
-
-        }
+    favorites.unshift(
+        current
     );
 
 
 
-    favoriteQuotes.push(
-        currentQuote
-    );
-
-
-
-    updateFavoriteButton();
+    saveData();
 
 
 
@@ -371,154 +409,20 @@ async function favoriteCurrentQuote(){
 
 
 
-/*
-================================================
-
-取消收藏
-
-================================================
-*/
-
-
-async function removeFavorite(
-    id
+function renderQuote(
+quote
 ){
 
 
 
-    await deleteData(
-        STORES.quotes,
-        id
-    );
-
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-加载收藏
-
-================================================
-*/
-
-
-async function loadFavorites(){
-
-
-
-    favoriteQuotes =
-    await getAllData(
-        STORES.quotes
-    );
-
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-按钮事件
-
-================================================
-*/
-
-
-function bindEvents(){
-
-
-
-    const randomButton =
+    const box =
     document.getElementById(
-        "new-quote"
+        "quote-content"
     );
 
 
 
-    const favoriteButton =
-    document.getElementById(
-        "favorite-quote"
-    );
-
-
-
-
-    if(randomButton){
-
-
-        randomButton.addEventListener(
-            "click",
-            generateQuote
-        );
-
-
-    }
-
-
-
-
-    if(favoriteButton){
-
-
-        favoriteButton.addEventListener(
-            "click",
-            favoriteCurrentQuote
-        );
-
-
-    }
-
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-收藏按钮状态
-
-================================================
-*/
-
-
-function updateFavoriteButton(){
-
-
-
-    const button =
-    document.getElementById(
-        "favorite-quote"
-    );
-
-
-
-    if(!button){
+    if(!box){
 
         return;
 
@@ -526,13 +430,55 @@ function updateFavoriteButton(){
 
 
 
-    button.innerHTML =
+    box.innerHTML=`
 
-    `
 
-    <i class="fa-solid fa-heart"></i>
+    <div class="quote-card">
 
-    已收藏
+
+    <p class="quote-text">
+
+
+    ${quote.text}
+
+
+    </p>
+
+
+
+    <p>
+
+
+    ${quote.author}
+
+
+    </p>
+
+
+
+
+    ${
+        quote.translation
+        ?
+        `
+        <hr>
+
+        <p>
+
+        ${quote.translation}
+
+        </p>
+
+        `
+        :
+        ""
+
+    }
+
+
+
+    </div>
+
 
     `;
 
@@ -548,32 +494,74 @@ function updateFavoriteButton(){
 
 
 
-/*
-================================================
-
-初始化
-
-================================================
-*/
-
-
-export async function initQuotes(){
+function render(){
 
 
 
-    await loadQuotes();
+    container.innerHTML=`
 
 
 
-    await loadFavorites();
+    <div class="quote-box">
+
+
+    <h2>
+
+    今日句子
+
+    </h2>
 
 
 
-    bindEvents();
+    <div id="quote-content">
+
+    </div>
 
 
 
-    generateQuote();
+    <button id="new-quote">
+
+    换一句
+
+    </button>
+
+
+
+    <button id="save-quote">
+
+    收藏
+
+    </button>
+
+
+
+    </div>
+
+
+
+    `;
+
+
+
+    document
+    .getElementById(
+        "new-quote"
+    )
+    .onclick=
+    generate;
+
+
+
+    document
+    .getElementById(
+        "save-quote"
+    )
+    .onclick=
+    favorite;
+
+
+
+    generate();
 
 
 
@@ -587,22 +575,30 @@ export async function initQuotes(){
 
 
 
-/*
-================================================
-
-外部调用接口
-
-================================================
-*/
+export async function init(){
 
 
-export {
 
-    generateQuote,
-
-    favoriteCurrentQuote,
-
-    randomQuote
+    container =
+    document.getElementById(
+        "quote-container"
+    );
 
 
-};
+
+    if(!container){
+
+        return;
+
+    }
+
+
+
+    await loadData();
+
+
+    render();
+
+
+
+}
