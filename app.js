@@ -1,7 +1,7 @@
 /*
 ================================================
 
-LXY SPACE
+bieudhbswot22-splace21676816
 
 Main Application Controller
 
@@ -9,20 +9,32 @@ Main Application Controller
 */
 
 
-/*
------------------------------------------------
-模块导入
 
-后续文件创建后会启用
+import {
 
-目前保留结构
------------------------------------------------
-*/
+    initStorage
+
+} from "./modules/storage.js";
 
 
-// import { initStorage } from "./modules/storage.js";
-// import { initQuotes } from "./modules/quotes.js";
-// import { initMusic } from "./modules/music.js";
+import {
+
+    initQuotes
+
+} from "./modules/quotes.js";
+
+
+import {
+
+    initMusic
+
+} from "./modules/music.js";
+
+
+
+
+// 后续添加
+
 // import { initGames } from "./modules/games.js";
 // import { initDiary } from "./modules/diary.js";
 // import { initGallery } from "./modules/gallery.js";
@@ -37,39 +49,29 @@ Main Application Controller
 /*
 ================================================
 
-全局应用对象
-
-所有模块共享
+全局对象
 
 ================================================
 */
 
 
-const LXY_APP = {
+const APP = {
 
 
     version:"1.0.0",
 
 
-    settings:{
-
-
-        theme:"light"
-
-
-    },
+    theme:"light",
 
 
     user:{
 
 
-        name:"LXY"
+        name:""
 
 
-    },
+    }
 
-
-    modules:{}
 
 
 };
@@ -79,28 +81,25 @@ const LXY_APP = {
 
 
 
+
+
+
 /*
 ================================================
 
-工具函数
+工具
 
 ================================================
 */
 
 
-function $(selector){
+const $ =
+selector =>
+document.querySelector(
+    selector
+);
 
-    return document.querySelector(selector);
 
-}
-
-
-
-function $all(selector){
-
-    return document.querySelectorAll(selector);
-
-}
 
 
 
@@ -111,7 +110,7 @@ function $all(selector){
 /*
 ================================================
 
-页面系统
+导航
 
 ================================================
 */
@@ -120,21 +119,26 @@ function $all(selector){
 function initNavigation(){
 
 
+
     const buttons =
-    $all(".navigation button");
+    document.querySelectorAll(
+        "[data-page]"
+    );
 
 
 
     const pages =
-    $all(".page");
+    document.querySelectorAll(
+        ".page"
+    );
 
 
 
-    buttons.forEach(button=>{
+    buttons.forEach(
+        button=>{
 
 
-        button.addEventListener(
-            "click",
+            button.onclick =
             ()=>{
 
 
@@ -143,29 +147,31 @@ function initNavigation(){
 
 
 
-                pages.forEach(page=>{
+                pages.forEach(
+                    page=>{
 
 
-                    page.classList.remove(
-                        "active"
-                    );
+                        page.classList.remove(
+                            "active"
+                        );
 
 
-                });
+                    }
+                );
 
 
 
-                const targetPage =
+                const page =
                 document.getElementById(
                     target+"-page"
                 );
 
 
 
-                if(targetPage){
+                if(page){
 
 
-                    targetPage.classList.add(
+                    page.classList.add(
                         "active"
                     );
 
@@ -173,12 +179,11 @@ function initNavigation(){
                 }
 
 
-            }
-        );
+            };
 
 
-    });
-
+        }
+    );
 
 
 }
@@ -190,10 +195,11 @@ function initNavigation(){
 
 
 
+
 /*
 ================================================
 
-主题系统
+主题
 
 ================================================
 */
@@ -203,14 +209,14 @@ function initTheme(){
 
 
 
-    const toggle =
+    const button =
     $("#theme-toggle");
 
 
 
     const saved =
     localStorage.getItem(
-        "lxy-theme"
+        "theme"
     );
 
 
@@ -218,56 +224,57 @@ function initTheme(){
     if(saved==="dark"){
 
 
-        document.body.classList.add(
+        document.body
+        .classList
+        .add(
             "dark"
         );
 
 
-        LXY_APP.settings.theme =
-        "dark";
+        APP.theme="dark";
 
 
     }
 
 
 
-
-
-    toggle.addEventListener(
+    button?.addEventListener(
         "click",
         ()=>{
 
 
-            document.body.classList.toggle(
+            document.body
+            .classList
+            .toggle(
                 "dark"
             );
 
 
 
             const dark =
-            document.body.classList.contains(
+            document.body
+            .classList
+            .contains(
                 "dark"
             );
 
 
 
-            LXY_APP.settings.theme =
-            dark ?
+            APP.theme =
+            dark?
             "dark":
             "light";
 
 
 
             localStorage.setItem(
-                "lxy-theme",
-                LXY_APP.settings.theme
+                "theme",
+                APP.theme
             );
-
 
 
         }
     );
-
 
 
 }
@@ -283,21 +290,14 @@ function initTheme(){
 /*
 ================================================
 
-基础事件
+快捷入口
 
 ================================================
 */
 
 
-function initBasicEvents(){
+function initShortcuts(){
 
-
-
-    /*
-    快捷入口按钮
-
-    后续连接页面
-    */
 
 
     const shortcuts =
@@ -308,45 +308,30 @@ function initBasicEvents(){
 
 
     shortcuts.forEach(
-        (item,index)=>{
+        button=>{
 
 
-            item.addEventListener(
-                "click",
-                ()=>{
+            button.onclick =
+            ()=>{
 
 
-                    const pages=[
-                        "music",
-                        "games",
-                        "diary",
-                        "gallery",
-                        "ai"
-                    ];
+                const page =
+                button.dataset.goto;
 
 
 
-                    const target =
-                    pages[index];
+                const nav =
+                document.querySelector(
+                    `[data-page="${page}"]`
+                );
 
 
 
-                    const button =
-                    document.querySelector(
-                    `[data-page="${target}"]`
-                    );
+                nav?.click();
 
 
 
-                    if(button){
-
-                        button.click();
-
-                    }
-
-
-                }
-            );
+            };
 
 
         }
@@ -364,11 +349,10 @@ function initBasicEvents(){
 
 
 
-
 /*
 ================================================
 
-模块初始化
+模块启动
 
 ================================================
 */
@@ -378,16 +362,23 @@ async function initModules(){
 
 
 
+    await initStorage();
+
+
+
+    await initQuotes();
+
+
+
+    initMusic();
+
+
+
+
     /*
     
     后续开启：
 
-    
-    await initStorage();
-
-    await initQuotes();
-
-    await initMusic();
 
     await initGames();
 
@@ -415,18 +406,18 @@ async function initModules(){
 /*
 ================================================
 
-启动应用
+启动
 
 ================================================
 */
 
 
-async function startApp(){
+async function start(){
 
 
 
     console.log(
-        "LXY Space Starting..."
+        "bieudhbswot22-splace21676816 starting..."
     );
 
 
@@ -439,7 +430,7 @@ async function startApp(){
 
 
 
-    initBasicEvents();
+    initShortcuts();
 
 
 
@@ -447,11 +438,9 @@ async function startApp(){
 
 
 
-
     console.log(
-        "LXY Space Ready."
+        "System ready."
     );
-
 
 
 }
@@ -461,28 +450,17 @@ async function startApp(){
 
 
 
-/*
-启动
-*/
+
 
 
 document.addEventListener(
     "DOMContentLoaded",
-    startApp
+    start
 );
 
 
 
 
 
-
-/*
-暴露全局
-
-方便调试
-
-*/
-
-
-window.LXY_APP =
-LXY_APP;
+window.APP =
+APP;
