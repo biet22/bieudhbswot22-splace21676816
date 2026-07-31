@@ -1,68 +1,30 @@
 /*
 ================================================
 
-LXY SPACE
+bieudhbswot22-splace21676816
 
 Storage System
 
-IndexedDB Data Manager
+本地数据管理
 
 ================================================
 */
 
 
-const DATABASE_NAME = "LXY_SPACE_DB";
-
-const DATABASE_VERSION = 1;
-
-
-let database = null;
+const DB_NAME =
+"PrivateSpaceDB";
 
 
+const DB_VERSION =
+1;
+
+
+const STORE_NAME =
+"data";
 
 
 
-
-/*
-================================================
-
-数据库结构
-
-================================================
-*/
-
-
-const STORES = {
-
-
-    settings:"settings",
-
-
-    quotes:"quotes",
-
-
-    music:"music",
-
-
-    diary:"diary",
-
-
-    todos:"todos",
-
-
-    countdown:"countdown",
-
-
-    gallery:"gallery",
-
-
-    games:"games",
-
-
-    ai:"ai"
-
-
-};
+let db=null;
 
 
 
@@ -71,46 +33,23 @@ const STORES = {
 
 
 
-/*
-================================================
 
-打开数据库
+function openDB(){
 
-================================================
-*/
-
-
-export function initStorage(){
 
 
     return new Promise(
-        (resolve,reject)=>{
+        (
+            resolve,
+            reject
+        )=>{
 
 
             const request =
             indexedDB.open(
-                DATABASE_NAME,
-                DATABASE_VERSION
+                DB_NAME,
+                DB_VERSION
             );
-
-
-
-            request.onerror = ()=>{
-
-
-                console.error(
-                    "Database Error"
-                );
-
-
-                reject(
-                    request.error
-                );
-
-
-            };
-
-
 
 
 
@@ -118,37 +57,29 @@ export function initStorage(){
             event=>{
 
 
-                const db =
+                const database =
                 event.target.result;
 
 
 
-                Object.values(STORES)
-                .forEach(store=>{
+                if(
+                    !database.objectStoreNames.contains(
+                        STORE_NAME
+                    )
+                ){
 
 
-                    if(!db.objectStoreNames.contains(store)){
+                    database
+                    .createObjectStore(
+                        STORE_NAME
+                    );
 
 
-                        db.createObjectStore(
-                            store,
-                            {
-                                keyPath:"id",
-                                autoIncrement:true
-                            }
-                        );
-
-
-                    }
-
-
-                });
+                }
 
 
 
             };
-
-
 
 
 
@@ -158,18 +89,11 @@ export function initStorage(){
             event=>{
 
 
-                database =
+                db =
                 event.target.result;
 
 
-
-                console.log(
-                    "Storage initialized"
-                );
-
-
-                resolve(database);
-
+                resolve(db);
 
 
             };
@@ -177,212 +101,22 @@ export function initStorage(){
 
 
 
-        }
-    );
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-获取表
-
-================================================
-*/
-
-
-function getStore(
-    storeName,
-    mode="readonly"
-){
-
-
-    const transaction =
-    database.transaction(
-        storeName,
-        mode
-    );
-
-
-    return transaction.objectStore(
-        storeName
-    );
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-新增数据
-
-================================================
-*/
-
-
-export function addData(
-    store,
-    data
-){
-
-
-    return new Promise(
-        (resolve,reject)=>{
-
-
-            const request =
-            getStore(
-                store,
-                "readwrite"
-            )
-            .add(data);
-
-
-
-            request.onsuccess =
-            ()=>resolve(
-                request.result
-            );
-
-
 
             request.onerror =
-            ()=>reject(
-                request.error
-            );
+            error=>{
 
 
-
-        }
-    );
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-获取全部数据
-
-================================================
-*/
-
-
-export function getAllData(
-    store
-){
-
-
-    return new Promise(
-        (resolve,reject)=>{
-
-
-            const request =
-            getStore(store)
-            .getAll();
-
-
-
-            request.onsuccess =
-            ()=>{
-
-
-                resolve(
-                    request.result
-                );
+                reject(error);
 
 
             };
 
 
 
-            request.onerror =
-            ()=>reject(
-                request.error
-            );
-
-
-
         }
     );
 
 
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-根据ID获取
-
-================================================
-*/
-
-
-export function getData(
-    store,
-    id
-){
-
-
-    return new Promise(
-        (resolve,reject)=>{
-
-
-            const request =
-            getStore(store)
-            .get(id);
-
-
-
-            request.onsuccess =
-            ()=>resolve(
-                request.result
-            );
-
-
-
-            request.onerror =
-            ()=>reject(
-                request.error
-            );
-
-
-        }
-    );
-
 
 }
 
@@ -394,241 +128,83 @@ export function getData(
 
 
 
-/*
-================================================
+async function getDB(){
 
-更新数据
 
-================================================
-*/
 
+    if(db){
 
-export function updateData(
-    store,
-    data
-){
-
-
-    return new Promise(
-        (resolve,reject)=>{
-
-
-            const request =
-            getStore(
-                store,
-                "readwrite"
-            )
-            .put(data);
-
-
-
-            request.onsuccess =
-            ()=>resolve(
-                request.result
-            );
-
-
-
-            request.onerror =
-            ()=>reject(
-                request.error
-            );
-
-
-
-        }
-    );
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-删除数据
-
-================================================
-*/
-
-
-export function deleteData(
-    store,
-    id
-){
-
-
-    return new Promise(
-        (resolve,reject)=>{
-
-
-            const request =
-            getStore(
-                store,
-                "readwrite"
-            )
-            .delete(id);
-
-
-
-            request.onsuccess =
-            ()=>resolve(true);
-
-
-
-            request.onerror =
-            ()=>reject(
-                request.error
-            );
-
-
-
-        }
-    );
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-设置管理
-
-================================================
-*/
-
-
-export async function saveSetting(
-    key,
-    value
-){
-
-
-    return updateData(
-        STORES.settings,
-        {
-
-            id:key,
-
-            value:value
-
-        }
-    );
-
-
-}
-
-
-
-
-
-
-export async function getSetting(
-    key
-){
-
-
-    const result =
-    await getData(
-        STORES.settings,
-        key
-    );
-
-
-    return result ?
-    result.value :
-    null;
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-音乐统计专用
-
-================================================
-*/
-
-
-export async function updateMusicHistory(
-    music
-){
-
-
-
-    const history =
-    await getAllData(
-        STORES.music
-    );
-
-
-
-    const old =
-    history.find(
-        item=>
-        item.path===music.path
-    );
-
-
-
-    if(old){
-
-
-        old.playCount +=1;
-
-
-        old.totalTime +=
-        music.duration || 0;
-
-
-
-        await updateData(
-            STORES.music,
-            old
-        );
-
+        return db;
 
     }
-    else{
 
 
-        await addData(
-            STORES.music,
-            {
+
+    return await openDB();
 
 
-                ...music,
+}
 
 
-                playCount:1,
 
 
-                totalTime:
-                music.duration || 0
+
+
+
+
+
+export async function saveGameData(
+key,
+value
+){
+
+
+
+    try{
+
+
+        const database =
+        await getDB();
+
+
+
+        return new Promise(
+            (
+                resolve,
+                reject
+            )=>{
+
+
+                const transaction =
+                database.transaction(
+                    STORE_NAME,
+                    "readwrite"
+                );
+
+
+
+                const store =
+                transaction.objectStore(
+                    STORE_NAME
+                );
+
+
+
+                const request =
+                store.put(
+                    value,
+                    key
+                );
+
+
+
+                request.onsuccess =
+                ()=>resolve(true);
+
+
+
+                request.onerror =
+                error=>reject(error);
 
 
 
@@ -636,6 +212,25 @@ export async function updateMusicHistory(
         );
 
 
+
+    }
+
+    catch(error){
+
+
+        console.error(
+            "Storage save error:",
+            error
+        );
+
+
+
+        localStorage.setItem(
+            key,
+            JSON.stringify(value)
+        );
+
+
     }
 
 
@@ -650,17 +245,265 @@ export async function updateMusicHistory(
 
 
 
-/*
-================================================
-
-导出表名
-
-================================================
-*/
+export async function getGameData(
+key
+){
 
 
-export {
 
-    STORES
+    try{
 
-};
+
+        const database =
+        await getDB();
+
+
+
+        return new Promise(
+            (
+                resolve,
+                reject
+            )=>{
+
+
+                const transaction =
+                database.transaction(
+                    STORE_NAME,
+                    "readonly"
+                );
+
+
+
+                const store =
+                transaction.objectStore(
+                    STORE_NAME
+                );
+
+
+
+                const request =
+                store.get(
+                    key
+                );
+
+
+
+                request.onsuccess =
+                ()=>{
+
+
+                    resolve(
+                        request.result
+                    );
+
+
+                };
+
+
+
+                request.onerror =
+                error=>reject(error);
+
+
+
+            }
+        );
+
+
+
+    }
+
+
+    catch(error){
+
+
+
+        const saved =
+        localStorage.getItem(
+            key
+        );
+
+
+
+        return saved
+        ?
+        JSON.parse(saved)
+        :
+        null;
+
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export async function deleteGameData(
+key
+){
+
+
+
+    const database =
+    await getDB();
+
+
+
+    const transaction =
+    database.transaction(
+        STORE_NAME,
+        "readwrite"
+    );
+
+
+
+    transaction
+    .objectStore(
+        STORE_NAME
+    )
+    .delete(
+        key
+    );
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export async function clearAllData(){
+
+
+
+    const database =
+    await getDB();
+
+
+
+    const transaction =
+    database.transaction(
+        STORE_NAME,
+        "readwrite"
+    );
+
+
+
+    transaction
+    .objectStore(
+        STORE_NAME
+    )
+    .clear();
+
+
+
+    localStorage.clear();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export async function exportData(){
+
+
+
+    const keys=[
+
+
+        "pet",
+
+        "characters",
+
+        "diary",
+
+        "todo",
+
+        "countdown",
+
+        "gallery"
+
+
+    ];
+
+
+
+    const result={};
+
+
+
+    for(
+        const key of keys
+    ){
+
+
+        result[key]=
+        await getGameData(
+            key
+        );
+
+
+    }
+
+
+
+    return result;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export async function importData(
+data
+){
+
+
+
+    for(
+        const key
+        in data
+    ){
+
+
+
+        await saveGameData(
+            key,
+            data[key]
+        );
+
+
+
+    }
+
+
+
+}
