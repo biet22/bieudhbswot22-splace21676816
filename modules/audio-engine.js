@@ -5,25 +5,31 @@ bieudhbswot22-splace21676816
 
 Audio Engine
 
-高级音频控制系统
+音乐核心引擎
 
 ================================================
 */
 
 
-let audioContext = null;
+let audio=null;
 
 
-let masterGain = null;
+let context=null;
 
 
-let crossfadeTime = 5;
+let source=null;
 
 
-let currentSource = null;
+let gainNode=null;
 
 
-let nextSource = null;
+let analyser=null;
+
+
+let filters=[];
+
+
+let currentURL=null;
 
 
 
@@ -32,9 +38,573 @@ let nextSource = null;
 
 
 
-/*
-================================================
 
+function initAudio(){
+
+
+
+    if(audio){
+
+        return;
+
+    }
+
+
+
+    audio =
+    new Audio();
+
+
+
+    audio.preload =
+    "metadata";
+
+
+
+    context =
+    new AudioContext();
+
+
+
+    gainNode =
+    context.createGain();
+
+
+
+    analyser =
+    context.createAnalyser();
+
+
+
+    source =
+    context.createMediaElementSource(
+        audio
+    );
+
+
+
+    filters =
+    createEqualizer();
+
+
+
+    let chain =
+    source;
+
+
+
+    filters.forEach(
+        filter=>{
+
+
+            chain.connect(
+                filter
+            );
+
+
+            chain =
+            filter;
+
+
+        }
+    );
+
+
+
+    chain
+    .connect(
+        gainNode
+    );
+
+
+
+    gainNode
+    .connect(
+        analyser
+    );
+
+
+
+    analyser
+    .connect(
+        context.destination
+    );
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function createEqualizer(){
+
+
+
+    const frequencies=[
+
+
+        60,
+
+        170,
+
+        310,
+
+        600,
+
+        1000,
+
+        3000,
+
+        6000,
+
+        12000
+
+
+
+    ];
+
+
+
+    return frequencies.map(
+        frequency=>{
+
+
+            const filter =
+            context
+            .createBiquadFilter();
+
+
+
+            filter.type =
+            "peaking";
+
+
+
+            filter.frequency.value =
+            frequency;
+
+
+
+            filter.gain.value =
+            0;
+
+
+
+            filter.Q.value =
+            1;
+
+
+
+            return filter;
+
+
+        }
+    );
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export function setEQ(
+index,
+value
+){
+
+
+
+    if(
+        filters[index]
+    ){
+
+
+        filters[index]
+        .gain.value =
+        value;
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+export function loadMusic(
+url
+){
+
+
+
+    initAudio();
+
+
+
+    if(currentURL){
+
+
+        URL.revokeObjectURL(
+            currentURL
+        );
+
+
+    }
+
+
+
+    currentURL =
+    url;
+
+
+
+    audio.src =
+    url;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export async function play(){
+
+
+
+    initAudio();
+
+
+
+    if(
+        context.state==="suspended"
+    ){
+
+
+        await context.resume();
+
+
+    }
+
+
+
+    await audio.play();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export function pause(){
+
+
+
+    if(audio){
+
+
+        audio.pause();
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export function toggle(){
+
+
+
+    if(
+        audio.paused
+    ){
+
+
+        play();
+
+
+    }
+
+    else{
+
+
+        pause();
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export function seek(
+time
+){
+
+
+
+    if(audio){
+
+
+        audio.currentTime =
+        time;
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export function setVolume(
+value
+){
+
+
+
+    if(gainNode){
+
+
+        gainNode.gain.value =
+        value;
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export function getState(){
+
+
+
+    if(!audio){
+
+        return null;
+
+    }
+
+
+
+    return {
+
+
+        currentTime:
+        audio.currentTime,
+
+
+        duration:
+        audio.duration,
+
+
+        paused:
+        audio.paused
+
+
+    };
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export function getAudio(){
+
+
+
+    initAudio();
+
+
+    return audio;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export function fadeOut(
+duration=1000
+){
+
+
+
+    if(!gainNode){
+
+        return;
+
+    }
+
+
+
+    gainNode.gain.cancelScheduledValues(
+        context.currentTime
+    );
+
+
+
+    gainNode.gain.linearRampToValueAtTime(
+
+        0,
+
+        context.currentTime
+        +
+        duration/1000
+
+    );
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export function fadeIn(
+duration=1000
+){
+
+
+
+    if(!gainNode){
+
+        return;
+
+    }
+
+
+
+    gainNode.gain.setValueAtTime(
+
+        0,
+
+        context.currentTime
+
+    );
+
+
+
+    gainNode.gain.linearRampToValueAtTime(
+
+        1,
+
+        context.currentTime
+        +
+        duration/1000
+
+    );
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export function onEnded(
+callback
+){
+
+
+
+    if(audio){
+
+
+        audio.onended =
+        callback;
+
+
+    }
+
+
+
+}
 初始化音频引擎
 
 ================================================
