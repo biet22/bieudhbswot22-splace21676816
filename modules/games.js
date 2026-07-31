@@ -5,7 +5,7 @@ bieudhbswot22-splace21676816
 
 Game Center
 
-游戏中心管理模块
+游戏中心总入口
 
 ================================================
 */
@@ -13,88 +13,112 @@ Game Center
 
 import {
 
-    saveGameData,
-    getGameData
+    init as init2048
 
-} from "./storage.js";
-
+} from "./game2048.js";
 
 
+import {
+
+    init as initPet
+
+} from "./pet.js";
 
 
-/*
-================================================
+import {
 
-游戏列表
+    init as initDoodle
 
-================================================
-*/
+} from "./doodle.js";
 
 
-const games = {
+import {
+
+    init as initRunner
+
+} from "./runner.js";
+
+
+import {
+
+    init as initCharacters
+
+} from "./characters.js";
+
+
+
+
+
+let container=null;
+
+let currentDestroy=null;
+
+
+
+
+
+
+
+
+
+const games={
+
 
 
     "2048":{
 
-        name:
-        "2048",
+        name:"2048",
 
-        description:
-        "经典数字合并游戏",
+        icon:"🔢",
 
-        module:
-        "./game2048.js"
-
+        init:init2048
 
     },
-
 
 
     "pet":{
 
-        name:
-        "宠物",
+        name:"电子宠物",
 
-        description:
-        "养一只属于你的伙伴",
+        icon:"🐾",
 
-        module:
-        "./pet.js"
-
+        init:initPet
 
     },
-
 
 
     "doodle":{
 
-        name:
-        "涂鸦",
+        name:"涂鸦",
 
-        description:
-        "自由绘画",
+        icon:"🎨",
 
-        module:
-        "./doodle.js"
-
+        init:initDoodle
 
     },
 
 
-
     "runner":{
 
-        name:
-        "小跑酷",
+        name:"小跑酷",
 
-        description:
-        "跳跃并躲避障碍",
+        icon:"🏃",
 
-        module:
-        "./runner.js"
+        init:initRunner
 
+    },
+
+
+    "characters":{
+
+        name:"角色空间",
+
+        icon:"💬",
+
+        init:initCharacters
 
     }
+
 
 
 };
@@ -107,81 +131,113 @@ const games = {
 
 
 
-let currentGame=null;
+function showMenu(){
+
+
+
+    container.innerHTML=`
+
+
+
+    <div class="game-home">
+
+
+    <h2>
+
+    游戏中心
+
+    </h2>
+
+
+
+    <div class="game-list">
+
+
+    </div>
+
+
+    </div>
+
+
+    `;
 
 
 
 
+    const list =
+    container.querySelector(
+        ".game-list"
+    );
 
 
 
+    Object.keys(games)
+    .forEach(
+        id=>{
 
 
-/*
-================================================
-
-加载游戏模块
-
-================================================
-*/
-
-
-async function loadGame(
-    id
-){
+            const game =
+            games[id];
 
 
 
-    const game =
-    games[id];
+            const card =
+            document.createElement(
+                "div"
+            );
 
 
 
-    if(!game){
-
-        return;
-
-    }
+            card.className=
+            "game-card";
 
 
 
-    try{
+            card.innerHTML=`
 
 
-        const module =
-        await import(
-            game.module
-        );
+            <div>
+
+            ${game.icon}
+
+            </div>
+
+
+            <h3>
+
+            ${game.name}
+
+            </h3>
+
+
+            <button>
+
+            开始
+
+            </button>
+
+
+            `;
 
 
 
-        if(
-            module.init
-        ){
+            card
+            .querySelector(
+                "button"
+            )
+            .onclick=
+            ()=>openGame(id);
 
 
-            currentGame =
-            await module.init();
+
+            list.appendChild(
+                card
+            );
 
 
         }
+    );
 
-
-
-    }
-
-
-
-    catch(error){
-
-
-        console.error(
-            "Game load error:",
-            error
-        );
-
-
-    }
 
 
 }
@@ -194,22 +250,101 @@ async function loadGame(
 
 
 
-/*
-================================================
-
-显示游戏菜单
-
-================================================
-*/
-
-
-function renderGameMenu(){
+async function openGame(id){
 
 
 
-    const container =
+    if(currentDestroy){
+
+
+        currentDestroy();
+
+
+        currentDestroy=null;
+
+
+    }
+
+
+
+    container.innerHTML=`
+
+
+    <button id="back-game">
+
+    ← 返回游戏列表
+
+    </button>
+
+
+    <div id="active-game">
+
+    </div>
+
+
+    `;
+
+
+
+
+    document
+    .getElementById(
+        "back-game"
+    )
+    .onclick=
+    ()=>{
+
+
+        if(currentDestroy){
+
+            currentDestroy();
+
+        }
+
+
+        showMenu();
+
+
+    };
+
+
+
+
+    const active =
     document.getElementById(
-        "game-list"
+        "active-game"
+    );
+
+
+
+    active.id =
+    "game-container";
+
+
+
+    currentDestroy =
+    await games[id]
+    .init();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+export async function init(){
+
+
+
+    container =
+    document.getElementById(
+        "game-container"
     );
 
 
@@ -222,144 +357,8 @@ function renderGameMenu(){
 
 
 
-    container.innerHTML="";
+    showMenu();
 
-
-
-
-    Object.keys(games)
-    .forEach(
-        id=>{
-
-
-            const button =
-            document.createElement(
-                "button"
-            );
-
-
-
-            button.className =
-            "game-card";
-
-
-
-            button.innerHTML = `
-
-            <h3>
-            ${games[id].name}
-            </h3>
-
-            <p>
-            ${games[id].description}
-            </p>
-
-            `;
-
-
-
-            button.onclick =
-            ()=>loadGame(
-                id
-            );
-
-
-
-            container.appendChild(
-                button
-            );
 
 
         }
-    );
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-退出游戏
-
-================================================
-*/
-
-
-function closeGame(){
-
-
-
-    if(
-        currentGame
-        &&
-        currentGame.destroy
-    ){
-
-
-        currentGame.destroy();
-
-
-    }
-
-
-
-    currentGame=null;
-
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-初始化
-
-================================================
-*/
-
-
-export async function initGames(){
-
-
-
-    renderGameMenu();
-
-
-
-}
-
-
-
-
-
-
-
-
-
-export {
-
-
-    games,
-
-    loadGame,
-
-    closeGame
-
-
-};
