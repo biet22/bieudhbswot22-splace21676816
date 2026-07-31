@@ -1,115 +1,24 @@
 /*
 ================================================
 
-bieudhbswot22-splace21676816
+Private Space
 
-Lyrics System
-
-歌词解析与同步模块
+Lyrics Reader
 
 ================================================
 */
 
 
-let lyrics = [];
 
-let currentLine = -1;
-
-
-
-
-
-
-
-
-/*
-================================================
-
-歌词容器
-
-================================================
-*/
-
-
-let lyricsContainer = null;
-
-
-
-
-
-
-
-
-/*
-================================================
-
-初始化
-
-================================================
-*/
-
-
-export function initLyrics(){
-
-
-
-    lyricsContainer =
-    document.getElementById(
-        "lyrics-container"
-    );
-
-
-
-    if(!lyricsContainer){
-
-
-        console.warn(
-            "Lyrics container missing"
-        );
-
-
-    }
-
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-解析 LRC
-
-格式：
-
-[00:12.50]hello world
-
-================================================
-*/
-
-
-export function parseLRC(
-    lrcText
-){
-
+export function parseLRC(text){
 
 
     const lines =
-    lrcText.split(
-        "\n"
-    );
+    text.split("\n");
 
 
 
-    const result = [];
-
+    const result=[];
 
 
 
@@ -127,24 +36,13 @@ export function parseLRC(
             if(match){
 
 
-                const minutes =
-                parseInt(
-                    match[1]
-                );
-
-
-
-                const seconds =
-                parseFloat(
-                    match[2]
-                );
-
-
-
                 const time =
-                minutes * 60
+
+                Number(match[1])*60
+
                 +
-                seconds;
+
+                Number(match[2]);
 
 
 
@@ -153,10 +51,9 @@ export function parseLRC(
                     time,
 
                     text:
-                    match[3].trim()
+                    match[3]
 
                 });
-
 
 
             }
@@ -169,7 +66,10 @@ export function parseLRC(
 
 
     return result.sort(
-        (a,b)=>
+        (
+            a,
+            b
+        )=>
         a.time-b.time
     );
 
@@ -184,236 +84,90 @@ export function parseLRC(
 
 
 
-/*
-================================================
+export async function readLyrics(file){
 
-加载LRC文件
 
-================================================
-*/
 
-
-export async function loadLRC(
-    file
-){
-
-
-
-    const text =
-    await file.text();
-
-
-
-    lyrics =
-    parseLRC(
-        text
-    );
-
-
-
-    renderLyrics();
-
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-加载内嵌歌词
-
-================================================
-*/
-
-
-export function loadEmbeddedLyrics(
-    text
-){
-
-
-
-    if(!text){
-
-
-        lyrics=[];
-
-
-        renderLyrics();
-
-
-        return;
-
-
-    }
-
-
-
-    lyrics =
-    parseLRC(
-        text
-    );
-
-
-
-    renderLyrics();
-
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-显示歌词
-
-================================================
-*/
-
-
-function renderLyrics(){
-
-
-
-    if(!lyricsContainer){
-
-        return;
-
-    }
-
-
-
-    lyricsContainer.innerHTML="";
-
-
-
-    lyrics.forEach(
-        (line,index)=>{
-
-
-            const div =
-            document.createElement(
-                "div"
-            );
-
-
-
-            div.className =
-            "lyric-line";
-
-
-
-            div.dataset.index =
-            index;
-
-
-
-            div.innerText =
-            line.text;
-
-
-
-            lyricsContainer.appendChild(
-                div
-            );
-
-
-
-        }
-    );
-
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-同步歌词
-
-================================================
-*/
-
-
-export function updateLyrics(
-    currentTime
-){
-
-
-
-    if(
-        lyrics.length===0
-    ){
-
-        return;
-
-    }
-
-
-
-
-    let index = 0;
-
-
-
-
-    for(
-        let i=0;
-        i<lyrics.length;
-        i++
-    ){
-
+    try{
 
 
         if(
-            currentTime >=
-            lyrics[i].time
+            window.musicMetadata
         ){
 
-            index=i;
+
+            const metadata =
+            await window.musicMetadata.parseBlob(
+                file
+            );
+
+
+
+            const comment =
+            metadata
+            .native;
+
+
+
+            for(
+                const type
+                in comment
+            ){
+
+
+                const items =
+                comment[type];
+
+
+
+                for(
+                    const item
+                    of items
+                ){
+
+
+                    const value =
+                    item.value;
+
+
+
+                    if(
+                        typeof value==="string"
+                        &&
+                        (
+                        value.includes("[00:")
+                        ||
+                        value.includes("[0:")
+                        )
+                    ){
+
+
+                        return parseLRC(
+                            value
+                        );
+
+
+                    }
+
+
+                }
+
+
+            }
+
+
 
         }
 
 
     }
 
+    catch(error){
 
 
-
-    if(
-        index!==currentLine
-    ){
-
-
-        currentLine=index;
-
-
-
-        highlightLine(
-            index
+        console.warn(
+            "lyrics error",
+            error
         );
 
 
@@ -421,100 +175,6 @@ export function updateLyrics(
 
 
 
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-高亮当前歌词
-
-================================================
-*/
-
-
-function highlightLine(
-    index
-){
-
-
-
-    const lines =
-    document.querySelectorAll(
-        ".lyric-line"
-    );
-
-
-
-    lines.forEach(
-        (line,i)=>{
-
-
-            line.classList.toggle(
-                "active",
-                i===index
-            );
-
-
-        }
-    );
-
-
-
-    const active =
-    lines[index];
-
-
-
-    if(active){
-
-
-        active.scrollIntoView({
-
-            behavior:
-            "smooth",
-
-            block:
-            "center"
-
-        });
-
-
-    }
-
-
+    return [];
 
 }
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-获取当前歌词
-
-================================================
-*/
-
-
-export function getCurrentLyrics(){
-
-
-
-    return lyrics;
-
-
-              }
