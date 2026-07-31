@@ -1,40 +1,147 @@
 /*
 ================================================
 
-bieudhbswot22-splace21676816
+Private Space
 
-Music Metadata Parser
-
-音乐标签解析模块
+Music Metadata Reader
 
 ================================================
 */
 
 
-/*
-
-需要：
-
-music-metadata-browser
-
-后续接入
-
-功能：
-
-读取：
-
-- 标题
-- 歌手
-- 专辑
-- 年份
-- 封面
-
-*/
+export async function readMetadata(file){
 
 
-let metadataParser = null;
+    const result={
 
 
+        title:
+        file.name
+        .replace(
+            /\.[^/.]+$/,
+            ""
+        ),
+
+
+        artist:
+        "Unknown",
+
+
+        album:
+        "Unknown",
+
+
+        cover:null,
+
+
+        lyrics:null
+
+
+    };
+
+
+
+    try{
+
+
+        if(
+            window.musicMetadata
+        ){
+
+
+            const metadata =
+            await window.musicMetadata.parseBlob(
+                file
+            );
+
+
+            const common =
+            metadata.common;
+
+
+
+            result.title =
+            common.title
+            ||
+            result.title;
+
+
+
+            result.artist =
+            common.artist
+            ||
+            "Unknown";
+
+
+
+            result.album =
+            common.album
+            ||
+            "Unknown";
+
+
+
+            if(
+                common.picture
+                &&
+                common.picture.length
+            ){
+
+
+                const picture =
+                common.picture[0];
+
+
+
+                const blob =
+                new Blob(
+
+                    [
+                        picture.data
+
+                    ],
+
+                    {
+                        type:
+                        picture.format
+                    }
+
+                );
+
+
+
+                result.cover =
+                URL.createObjectURL(
+                    blob
+                );
+
+
+            }
+
+
+
+        }
+
+
+    }
+
+    catch(error){
+
+
+        console.warn(
+            "metadata error",
+            error
+        );
+
+
+    }
+
+
+
+    return result;
+
+
+}
 
 
 
