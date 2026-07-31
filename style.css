@@ -1,73 +1,64 @@
 /*
-========================================
+================================================
 
-LXY SPACE
-Main Style System
+bieudhbswot22-splace21676816
 
-========================================
+Main Style
+
+================================================
 */
 
 
-/* =========================
-   基础变量
-========================= */
+*{
 
+box-sizing:border-box;
 
-:root {
+margin:0;
 
-    --bg-color: #f5f5f7;
-
-    --card-color: rgba(255,255,255,0.75);
-
-    --text-color: #1d1d1f;
-
-    --sub-text: #666;
-
-    --border-color: rgba(0,0,0,0.08);
-
-    --accent-color: #6c63ff;
-
-    --shadow:
-        0 10px 30px rgba(0,0,0,0.08);
-
-    --blur: blur(20px);
-
-    --radius: 22px;
+padding:0;
 
 }
 
 
 
+:root{
 
 
-/* =========================
-   深色模式
-========================= */
+--bg:#f7f7fb;
+
+--card:#ffffff;
+
+--text:#222;
+
+--sub:#777;
+
+--border:#e8e8ee;
+
+--accent:#6c63ff;
+
+--shadow:
+0 10px 30px rgba(0,0,0,.08);
 
 
-body.dark {
+}
 
 
-    --bg-color: #0f0f12;
 
-    --card-color:
-        rgba(30,30,35,0.75);
+body.dark{
 
 
-    --text-color:
-        #f5f5f7;
+--bg:#111217;
 
+--card:#191b22;
 
-    --sub-text:
-        #aaa;
+--text:#eeeeee;
 
+--sub:#aaaaaa;
 
-    --border-color:
-        rgba(255,255,255,0.08);
+--border:#30333d;
 
-
-    --shadow:
-        0 10px 40px rgba(0,0,0,0.5);
+--shadow:
+0 10px 30px rgba(0,0,0,.3);
 
 
 }
@@ -77,58 +68,30 @@ body.dark {
 
 
 
+body{
 
 
-
-/* =========================
-   全局
-========================= */
+background:
+var(--bg);
 
 
-* {
-
-    box-sizing:
-    border-box;
+color:
+var(--text);
 
 
-    margin:0;
+font-family:
 
-    padding:0;
-
-}
-
-
-
-body {
+"Inter",
+"Microsoft YaHei",
+sans-serif;
 
 
-    min-height:100vh;
+min-height:100vh;
 
 
-    background:
-    var(--bg-color);
-
-
-    color:
-    var(--text-color);
-
-
-    font-family:
-
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    "Microsoft YaHei",
-    sans-serif;
-
-
-    transition:
-
-    background .4s ease,
-    color .4s ease;
-
-
-    padding-bottom:120px;
+transition:
+background .3s,
+color .3s;
 
 
 }
@@ -137,151 +100,45 @@ body {
 
 
 
+button{
 
 
-button {
+border:none;
 
 
-    border:none;
+background:
+var(--card);
 
 
-    cursor:pointer;
+color:
+var(--text);
 
 
-    background:none;
+padding:10px 18px;
 
 
-    color:inherit;
+border-radius:14px;
 
 
-    font-size:15px;
+cursor:pointer;
 
 
-}
+box-shadow:
+var(--shadow);
 
 
-
-button:active {
-
-
-    transform:
-    scale(.96);
-
-
-}
-
-
-
-
-
-
-
-
-
-/* =========================
-   顶部导航
-========================= */
-
-
-.top-bar {
-
-
-    position:sticky;
-
-
-    top:0;
-
-
-    z-index:100;
-
-
-    display:flex;
-
-
-    align-items:center;
-
-
-    justify-content:space-between;
-
-
-    padding:
-
-    18px 30px;
-
-
-    background:
-
-    var(--card-color);
-
-
-    backdrop-filter:
-
-    var(--blur);
-
-
-    border-bottom:
-
-    1px solid var(--border-color);
+transition:.25s;
 
 
 }
 
 
 
-.logo {
+button:hover{
 
 
-    font-weight:700;
-
-
-    letter-spacing:2px;
-
-
-    font-size:20px;
-
-
-}
-
-
-
-
-.navigation {
-
-
-    display:flex;
-
-
-    gap:8px;
-
-
-}
-
-
-
-.navigation button {
-
-
-    padding:
-
-    10px 15px;
-
-
-    border-radius:14px;
-
-
-    transition:.3s;
-
-
-}
-
-
-
-.navigation button:hover {
-
-
-    background:
-
-    rgba(128,128,128,.15);
+transform:
+translateY(-2px);
 
 
 }
@@ -290,23 +147,91 @@ button:active {
 
 
 
+/*
+============================
+
+顶部
+
+============================
+*/
 
 
-#theme-toggle {
+.top-bar{
 
 
-    width:42px;
+height:70px;
 
 
-    height:42px;
+display:flex;
 
 
-    border-radius:50%;
+align-items:center;
 
 
-    background:
+justify-content:space-between;
 
-    rgba(128,128,128,.15);
+
+padding:
+0 25px;
+
+
+position:sticky;
+
+
+top:0;
+
+
+z-index:20;
+
+
+background:
+color-mix(
+in srgb,
+var(--bg) 80%,
+transparent
+);
+
+
+backdrop-filter:
+blur(15px);
+
+
+}
+
+
+
+.top-bar h1{
+
+
+font-size:22px;
+
+
+}
+
+
+
+nav{
+
+
+display:flex;
+
+
+gap:10px;
+
+
+}
+
+
+
+
+
+nav button{
+
+
+box-shadow:none;
+
+
+background:transparent;
 
 
 }
@@ -319,158 +244,39 @@ button:active {
 
 
 
-/* =========================
-   页面系统
-========================= */
+/*
+============================
+
+页面
+
+============================
+*/
 
 
-#app {
+.page{
 
 
-    max-width:
-
-    1100px;
+display:none;
 
 
-    margin:
-
-    30px auto;
-
-
-    padding:
-
-    0 20px;
+padding:
+30px;
 
 
-}
+max-width:1100px;
 
 
-
-.page {
-
-
-    display:none;
-
-
-    animation:
-
-    fade .35s ease;
+margin:auto;
 
 
 }
 
 
 
-.page.active {
+.page.active{
 
 
-    display:block;
-
-
-}
-
-
-
-@keyframes fade {
-
-
-    from {
-
-
-        opacity:0;
-
-
-        transform:
-        translateY(10px);
-
-
-    }
-
-
-    to {
-
-
-        opacity:1;
-
-
-        transform:
-        translateY(0);
-
-
-    }
-
-}
-
-
-
-
-
-
-
-/* =========================
-   卡片
-========================= */
-
-
-.card {
-
-
-    background:
-
-    var(--card-color);
-
-
-    backdrop-filter:
-
-    var(--blur);
-
-
-    border:
-
-    1px solid var(--border-color);
-
-
-    border-radius:
-
-    var(--radius);
-
-
-    padding:
-
-    25px;
-
-
-    margin-bottom:25px;
-
-
-    box-shadow:
-
-    var(--shadow);
-
-
-}
-
-
-
-.card-title {
-
-
-    font-size:20px;
-
-
-    font-weight:600;
-
-
-    margin-bottom:20px;
-
-
-    display:flex;
-
-
-    gap:10px;
-
-
-    align-items:center;
+display:block;
 
 
 }
@@ -479,166 +285,24 @@ button:active {
 
 
 
+.hero{
 
 
-
-/* =========================
-   随机句子
-========================= */
+text-align:center;
 
 
-.quote-card {
-
-
-    text-align:center;
-
-
-    padding:
-
-    40px 25px;
+margin:
+40px 0;
 
 
 }
 
 
 
-#quote-text {
+.hero h2{
 
 
-    font-size:
-
-    24px;
-
-
-    line-height:
-
-    1.6;
-
-
-    margin:
-
-    25px auto;
-
-
-    max-width:700px;
-
-
-}
-
-
-
-#quote-info {
-
-
-    color:
-
-    var(--sub-text);
-
-
-    font-size:14px;
-
-
-}
-
-
-
-.quote-buttons {
-
-
-    margin-top:25px;
-
-
-    display:flex;
-
-
-    justify-content:center;
-
-
-    gap:15px;
-
-
-}
-
-
-
-.quote-buttons button {
-
-
-    padding:
-
-    12px 22px;
-
-
-    border-radius:
-
-    30px;
-
-
-    background:
-
-    var(--accent-color);
-
-
-    color:white;
-
-
-}
-
-
-
-
-
-
-
-/* =========================
-   快捷入口
-========================= */
-
-
-.shortcut-grid {
-
-
-    display:grid;
-
-
-    grid-template-columns:
-
-    repeat(auto-fit,minmax(120px,1fr));
-
-
-    gap:15px;
-
-
-}
-
-
-
-.shortcut-grid button {
-
-
-    padding:
-
-    25px;
-
-
-    border-radius:20px;
-
-
-    background:
-
-    rgba(128,128,128,.12);
-
-
-    display:flex;
-
-
-    flex-direction:column;
-
-
-    gap:10px;
-
-
-    font-size:18px;
+font-size:45px;
 
 
 }
@@ -652,99 +316,58 @@ button:active {
 
 
 
-/* =========================
-   音乐区域
-========================= */
+/*
+============================
+
+随机句子
+
+============================
+*/
 
 
-#select-music-folder {
+.quote-box{
 
 
-    padding:
-
-    14px 25px;
-
-
-    background:
-
-    var(--accent-color);
+background:
+var(--card);
 
 
-    color:white;
+padding:30px;
 
 
-    border-radius:30px;
+border-radius:25px;
 
 
-}
-
-
-
-#music-list {
-
-
-    margin-top:25px;
+box-shadow:
+var(--shadow);
 
 
 }
 
 
 
+#quote-text{
 
 
-/* =========================
-   游戏
-========================= */
+font-size:26px;
 
 
-.game-grid {
+line-height:1.8;
 
 
-    display:grid;
-
-
-    grid-template-columns:
-
-    repeat(auto-fit,minmax(130px,1fr));
-
-
-    gap:15px;
+margin:
+20px 0;
 
 
 }
 
 
 
-.game-grid button {
+#quote-info{
 
 
-    padding:
-
-    30px;
-
-
-    border-radius:
-
-    20px;
-
-
-    background:
-
-    rgba(128,128,128,.15);
-
-
-    transition:.3s;
-
-
-}
-
-
-.game-grid button:hover {
-
-
-    transform:
-
-    translateY(-5px);
+color:
+var(--sub);
 
 
 }
@@ -753,296 +376,16 @@ button:active {
 
 
 
+.quote-buttons{
 
 
-/* =========================
-   日记
-========================= */
+display:flex;
 
 
-#diary-input {
+gap:15px;
 
 
-    width:100%;
-
-
-    height:220px;
-
-
-    resize:none;
-
-
-    border-radius:18px;
-
-
-    border:
-
-    1px solid var(--border-color);
-
-
-    background:
-
-    rgba(128,128,128,.1);
-
-
-    padding:20px;
-
-
-    color:inherit;
-
-
-    font-size:16px;
-
-
-}
-
-
-
-
-
-
-
-/* =========================
-   AI
-========================= */
-
-
-#system-prompt,
-
-
-#api-key,
-
-
-#model-name,
-
-
-#user-message {
-
-
-    width:100%;
-
-
-    padding:15px;
-
-
-    margin-bottom:12px;
-
-
-    border-radius:15px;
-
-
-    border:
-
-    1px solid var(--border-color);
-
-
-    background:
-
-    rgba(128,128,128,.1);
-
-
-    color:inherit;
-
-
-}
-
-
-
-#chat-box {
-
-
-    min-height:300px;
-
-
-    overflow:auto;
-
-
-    padding:15px;
-
-
-}
-
-
-
-
-
-
-
-
-/* =========================
-   底部播放器
-========================= */
-
-
-.player-bar {
-
-
-    position:fixed;
-
-
-    bottom:0;
-
-
-    left:0;
-
-
-    right:0;
-
-
-    z-index:200;
-
-
-    display:flex;
-
-
-    align-items:center;
-
-
-    justify-content:space-between;
-
-
-    gap:20px;
-
-
-    padding:
-
-    15px 30px;
-
-
-    background:
-
-    var(--card-color);
-
-
-    backdrop-filter:
-
-    blur(25px);
-
-
-    border-top:
-
-    1px solid var(--border-color);
-
-
-}
-
-
-
-
-
-
-
-.player-info {
-
-
-    display:flex;
-
-
-    align-items:center;
-
-
-    gap:15px;
-
-
-}
-
-
-
-#album-cover {
-
-
-    width:55px;
-
-
-    height:55px;
-
-
-    border-radius:14px;
-
-
-    object-fit:cover;
-
-
-    background:
-
-    rgba(128,128,128,.2);
-
-
-}
-
-
-
-#song-title {
-
-
-    font-weight:600;
-
-
-}
-
-
-
-#song-artist {
-
-
-    color:
-
-    var(--sub-text);
-
-
-    font-size:14px;
-
-
-}
-
-
-
-
-
-.player-controls {
-
-
-    display:flex;
-
-
-    gap:20px;
-
-
-    align-items:center;
-
-
-}
-
-
-
-.player-controls button {
-
-
-    font-size:20px;
-
-
-}
-
-
-
-
-
-
-
-.progress-area {
-
-
-    flex:1;
-
-
-}
-
-
-
-#progress {
-
-
-    width:100%;
+margin-top:20px;
 
 
 }
@@ -1055,95 +398,560 @@ button:active {
 
 
 
-/* =========================
-   手机适配
-========================= */
+/*
+============================
+
+快捷入口
+
+============================
+*/
+
+
+.shortcut-grid{
+
+
+display:grid;
+
+
+grid-template-columns:
+repeat(
+auto-fit,
+minmax(120px,1fr)
+);
+
+
+gap:20px;
+
+
+margin-top:30px;
+
+
+}
+
+
+.shortcut-grid button{
+
+
+height:90px;
+
+
+font-size:18px;
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+============================
+
+音乐
+
+============================
+*/
+
+
+.music-layout{
+
+
+display:flex;
+
+
+flex-direction:column;
+
+
+gap:25px;
+
+
+}
+
+
+
+.album-area{
+
+
+text-align:center;
+
+
+}
+
+
+
+#album-cover{
+
+
+width:240px;
+
+
+height:240px;
+
+
+object-fit:cover;
+
+
+border-radius:25px;
+
+
+box-shadow:
+var(--shadow);
+
+
+background:#ddd;
+
+
+}
+
+
+
+
+
+#song-title{
+
+
+margin-top:20px;
+
+
+font-size:25px;
+
+
+}
+
+
+
+#song-artist{
+
+
+color:
+var(--sub);
+
+
+}
+
+
+
+
+
+
+.player-control{
+
+
+background:
+var(--card);
+
+
+padding:25px;
+
+
+border-radius:25px;
+
+
+box-shadow:
+var(--shadow);
+
+
+}
+
+
+
+.buttons{
+
+
+display:flex;
+
+
+justify-content:center;
+
+
+gap:20px;
+
+
+margin:
+20px;
+
+
+}
+
+
+
+.buttons button{
+
+
+font-size:22px;
+
+
+}
+
+
+
+
+
+#progress{
+
+
+width:100%;
+
+
+}
+
+
+
+
+
+
+
+#music-list{
+
+
+background:
+var(--card);
+
+
+border-radius:20px;
+
+
+padding:15px;
+
+
+}
+
+
+
+.music-item{
+
+
+padding:15px;
+
+
+border-bottom:
+1px solid var(--border);
+
+
+cursor:pointer;
+
+
+}
+
+
+
+
+.music-item:hover{
+
+
+background:
+rgba(128,128,128,.1);
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+============================
+
+歌词
+
+============================
+*/
+
+
+.lyrics-box{
+
+
+background:
+var(--card);
+
+
+padding:25px;
+
+
+border-radius:25px;
+
+
+height:350px;
+
+
+overflow:hidden;
+
+
+}
+
+
+
+#lyrics-container{
+
+
+height:280px;
+
+
+overflow:auto;
+
+
+}
+
+
+
+.lyric-line{
+
+
+padding:12px;
+
+
+text-align:center;
+
+
+color:
+var(--sub);
+
+
+font-size:18px;
+
+
+transition:.3s;
+
+
+}
+
+
+
+
+/*
+当前歌词
+
+============================
+*/
+
+
+.lyric-line.active{
+
+
+color:
+var(--accent);
+
+
+font-size:22px;
+
+
+font-weight:bold;
+
+
+transform:
+scale(1.05);
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+============================
+
+均衡器
+
+============================
+*/
+
+
+.equalizer-box{
+
+
+background:
+var(--card);
+
+
+padding:25px;
+
+
+border-radius:25px;
+
+
+}
+
+
+
+.eq-sliders{
+
+
+display:flex;
+
+
+justify-content:center;
+
+
+gap:15px;
+
+
+}
+
+
+
+.eq-band{
+
+
+writing-mode:
+vertical-lr;
+
+
+height:150px;
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+============================
+
+其他区域
+
+============================
+*/
+
+
+.placeholder{
+
+
+background:
+var(--card);
+
+
+padding:40px;
+
+
+border-radius:25px;
+
+
+box-shadow:
+var(--shadow);
+
+
+text-align:center;
+
+
+color:
+var(--sub);
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+============================
+
+手机适配
+
+============================
+*/
 
 
 @media(max-width:700px){
 
 
 
-.top-bar {
+.top-bar{
 
 
-    flex-wrap:wrap;
+flex-direction:column;
 
 
-    gap:15px;
+height:auto;
 
 
-}
+gap:10px;
 
 
-
-.navigation {
-
-
-    width:100%;
-
-
-    overflow-x:auto;
+padding:15px;
 
 
 }
 
 
 
-.navigation button {
+nav{
 
 
-    white-space:nowrap;
+overflow-x:auto;
 
 
-}
-
-
-
-#quote-text {
-
-
-    font-size:20px;
+width:100%;
 
 
 }
 
 
 
-.player-bar {
+.page{
 
 
-    flex-direction:column;
-
-
-    align-items:stretch;
-
-
-    padding:12px;
+padding:20px;
 
 
 }
 
 
 
-.player-info {
+
+.hero h2{
 
 
-    justify-content:center;
-
-
-}
-
-
-
-.player-controls {
-
-
-    justify-content:center;
+font-size:35px;
 
 
 }
 
 
 
+#album-cover{
+
+
+width:190px;
+
+
+height:190px;
+
+
 }
+
+
+
+.eq-sliders{
+
+
+gap:8px;
+
+
+}
+
+
+
+   }
