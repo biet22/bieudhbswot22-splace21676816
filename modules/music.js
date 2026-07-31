@@ -1,11 +1,11 @@
 /*
 ================================================
 
-LXY SPACE
+bieudhbswot22-splace21676816
 
 Music Player Core
 
-音乐播放器核心模块
+Integrated Version
 
 ================================================
 */
@@ -18,39 +18,69 @@ import {
 } from "./storage.js";
 
 
+import {
+
+    getMetadata
+
+} from "./metadata.js";
+
+
+import {
+
+    updateLyrics,
+    loadEmbeddedLyrics,
+    loadLRC
+
+} from "./lyrics.js";
+
+
+import {
+
+    initEqualizer
+
+} from "./equalizer.js";
+
+
+import {
+
+    initAudioEngine,
+    fadeIn,
+    crossfade
+
+} from "./audio-engine.js";
+
+
+
+
 
 
 
 /*
 ================================================
 
-播放器状态
+播放器对象
 
 ================================================
 */
 
 
-const player = {
+const musicPlayer = {
 
 
     audio:
     new Audio(),
 
 
-    playlist:
-    [],
+    playlist:[],
 
 
-    currentIndex:
-    -1,
+    index:-1,
 
 
-    currentMusic:
-    null,
+    current:null,
 
 
-    playing:
-    false
+    historyStart:null
 
 
 };
@@ -71,19 +101,14 @@ const player = {
 */
 
 
-const MUSIC_EXTENSIONS = [
+const extensions=[
 
 
     "mp3",
-
     "flac",
-
     "wav",
-
     "m4a",
-
     "ogg",
-
     "aac"
 
 
@@ -96,80 +121,15 @@ const MUSIC_EXTENSIONS = [
 
 
 
-
-/*
-================================================
-
-工具
-
-================================================
-*/
-
-
 function getExtension(
-    filename
+    name
 ){
 
 
-    return filename
+    return name
     .split(".")
     .pop()
     .toLowerCase();
-
-
-}
-
-
-
-
-
-
-
-
-/*
-================================================
-
-选择音乐文件夹
-
-================================================
-*/
-
-
-async function selectMusicFolder(){
-
-
-
-    try{
-
-
-        const directory =
-        await window.showDirectoryPicker();
-
-
-
-        await scanDirectory(
-            directory
-        );
-
-
-
-        renderPlaylist();
-
-
-
-    }
-
-
-
-    catch(error){
-
-
-        console.log(
-            "Folder selection cancelled"
-        );
-
-
-    }
 
 
 }
@@ -191,7 +151,7 @@ async function selectMusicFolder(){
 */
 
 
-async function scanDirectory(
+async function scanFolder(
     directory
 ){
 
@@ -199,8 +159,7 @@ async function scanDirectory(
 
     for await(
         const entry
-        of
-        directory.values()
+        of directory.values()
     ){
 
 
@@ -210,7 +169,7 @@ async function scanDirectory(
         ){
 
 
-            const extension =
+            const ext =
             getExtension(
                 entry.name
             );
@@ -218,10 +177,8 @@ async function scanDirectory(
 
 
             if(
-                MUSIC_EXTENSIONS
-                .includes(extension)
+                extensions.includes(ext)
             ){
-
 
 
                 const file =
@@ -229,11 +186,14 @@ async function scanDirectory(
 
 
 
-                player.playlist.push({
+                const metadata =
+                await getMetadata(
+                    file
+                );
 
-                    name:
-                    file.name,
 
+
+                musicPlayer.playlist.push({
 
                     file,
 
@@ -244,12 +204,15 @@ async function scanDirectory(
                     ),
 
 
-                    playCount:
-                    0,
+                    metadata,
 
 
-                    duration:
-                    0
+                    name:
+                    metadata.title,
+
+
+                    played:
+                    false
 
 
                 });
@@ -258,8 +221,8 @@ async function scanDirectory(
             }
 
 
-        }
 
+        }
 
 
 
@@ -268,7 +231,7 @@ async function scanDirectory(
         ){
 
 
-            await scanDirectory(
+            await scanFolder(
                 entry
             );
 
@@ -293,7 +256,244 @@ async function scanDirectory(
 /*
 ================================================
 
-渲染播放列表
+选择音乐文件夹
+
+================================================
+*/
+
+
+async function chooseFolder(){
+
+
+    const directory =
+    await window.showDirectoryPicker();
+
+
+
+    musicPlayer.playlist=[];
+
+
+
+    await scanFolder(
+        directory
+    );
+
+
+
+    renderPlaylist();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+================================================
+
+播放歌曲
+
+================================================
+*/
+
+
+async function play(index){
+
+
+
+    const next =
+    musicPlayer.playlist[index];
+
+
+
+    if(!next){
+
+        return;
+
+    }
+
+
+
+
+    const oldAudio =
+    musicPlayer.audio;
+
+
+
+    musicPlayer.index =
+    index;
+
+
+
+    musicPlayer.current =
+    next;
+
+
+
+    const newAudio =
+    new Audio(
+        next.url
+    );
+
+
+
+    newAudio.volume=0;
+
+
+
+    musicPlayer.audio =
+    newAudio;
+
+
+
+    await loadMusicInfo(
+        next
+    );
+
+
+
+    initAudioEngine();
+
+
+
+    initEqualizer(
+        newAudio
+    );
+
+
+
+    newAudio.play();
+
+
+
+    fadeIn(
+        newAudio,
+        3
+    );
+
+
+
+    if(oldAudio.src){
+
+
+        crossfade(
+            oldAudio,
+            newAudio
+        );
+
+
+    }
+
+
+
+    startTracking();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+================================================
+
+加载歌曲信息
+
+================================================
+*/
+
+
+async function loadMusicInfo(
+    music
+){
+
+
+
+    const title =
+    document.getElementById(
+        "song-title"
+    );
+
+
+
+    const artist =
+    document.getElementById(
+        "song-artist"
+    );
+
+
+
+    const cover =
+    document.getElementById(
+        "album-cover"
+    );
+
+
+
+    if(title){
+
+
+        title.innerText =
+        music.metadata.title;
+
+
+    }
+
+
+
+    if(artist){
+
+
+        artist.innerText =
+        music.metadata.artist;
+
+
+    }
+
+
+
+
+    if(
+        cover &&
+        music.metadata.cover
+    ){
+
+
+        cover.src =
+        music.metadata.cover;
+
+
+    }
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+================================================
+
+播放列表显示
 
 ================================================
 */
@@ -303,14 +503,14 @@ function renderPlaylist(){
 
 
 
-    const list =
+    const box =
     document.getElementById(
         "music-list"
     );
 
 
 
-    if(!list){
+    if(!box){
 
         return;
 
@@ -318,11 +518,11 @@ function renderPlaylist(){
 
 
 
-    list.innerHTML="";
+    box.innerHTML="";
 
 
 
-    player.playlist
+    musicPlayer.playlist
     .forEach(
         (music,index)=>{
 
@@ -339,31 +539,26 @@ function renderPlaylist(){
 
 
 
-            item.innerHTML = `
-
-            🎵
-
-            ${music.name}
-
-            `;
+            item.innerText =
+            music.name;
 
 
 
             item.onclick =
-            ()=>playMusic(
+            ()=>play(
                 index
             );
 
 
 
-            list.appendChild(
+            box.appendChild(
                 item
             );
 
 
-
         }
     );
+
 
 
 }
@@ -379,20 +574,38 @@ function renderPlaylist(){
 /*
 ================================================
 
-播放音乐
+播放统计
 
 ================================================
 */
 
 
-async function playMusic(
-    index
-){
+function startTracking(){
+
+
+
+    musicPlayer.historyStart =
+    Date.now();
+
+
+
+    musicPlayer.audio
+    .addEventListener(
+        "ended",
+        saveHistory
+    );
+
+
+}
+
+
+
+async function saveHistory(){
 
 
 
     if(
-        !player.playlist[index]
+        !musicPlayer.current
     ){
 
         return;
@@ -402,52 +615,33 @@ async function playMusic(
 
 
 
-    player.currentIndex =
-    index;
+    const duration =
+    (
+        Date.now()
+        -
+        musicPlayer.historyStart
+    )
+    /
+    1000;
 
 
 
-    const music =
-    player.playlist[index];
-
-
-
-    player.currentMusic =
-    music;
-
-
-
-    player.audio.src =
-    music.url;
-
-
-
-    await player.audio.play();
-
-
-
-    player.playing =
-    true;
-
-
-
-    updatePlayerUI();
-
-
-
-    updateMusicHistory({
+    await updateMusicHistory({
 
         path:
-        music.name,
+        musicPlayer.current.file.name,
 
 
-        duration:
-        player.audio.duration
+        duration
+
 
     });
 
 
 
+    next();
+
+
 }
 
 
@@ -461,101 +655,104 @@ async function playMusic(
 /*
 ================================================
 
-暂停/播放
+歌词同步
 
 ================================================
 */
 
 
-function togglePlay(){
+musicPlayer.audio
+.addEventListener(
+    "timeupdate",
+    ()=>{
 
 
-
-    if(
-        !player.currentMusic
-    ){
-
-        if(
-            player.playlist.length
-        ){
-
-            playMusic(0);
-
-        }
-
-
-        return;
-
-    }
-
-
-
-
-
-    if(
-        player.audio.paused
-    ){
-
-
-        player.audio.play();
-
+        updateLyrics(
+            musicPlayer.audio.currentTime
+        );
 
 
     }
+);
 
+
+
+
+
+
+
+
+
+/*
+================================================
+
+控制
+
+================================================
+*/
+
+
+function toggle(){
+
+
+    if(
+        musicPlayer.audio.paused
+    ){
+
+        musicPlayer.audio.play();
+
+    }
 
     else{
 
-
-        player.audio.pause();
-
-
+        musicPlayer.audio.pause();
 
     }
-
 
 
 }
 
 
 
+function next(){
 
 
-
-
-
-
-/*
-================================================
-
-下一首
-
-================================================
-*/
-
-
-function nextMusic(){
-
-
-
-    let next =
-    player.currentIndex + 1;
-
+    let index =
+    musicPlayer.index+1;
 
 
     if(
-        next >= player.playlist.length
+        index>=musicPlayer.playlist.length
     ){
 
-        next=0;
+        index=0;
 
     }
 
 
+    play(index);
 
-    playMusic(
-        next
-    );
+
+}
+
+
+
+function previous(){
+
+
+    let index =
+    musicPlayer.index-1;
+
+
+    if(index<0){
+
+        index =
+        musicPlayer.playlist.length-1;
+
+    }
+
+
+    play(index);
 
 
 }
@@ -571,51 +768,7 @@ function nextMusic(){
 /*
 ================================================
 
-上一首
-
-================================================
-*/
-
-
-function previousMusic(){
-
-
-
-    let previous =
-    player.currentIndex - 1;
-
-
-
-    if(
-        previous < 0
-    ){
-
-        previous =
-        player.playlist.length-1;
-
-    }
-
-
-
-    playMusic(
-        previous
-    );
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-进度条
+进度
 
 ================================================
 */
@@ -625,14 +778,14 @@ function initProgress(){
 
 
 
-    const progress =
+    const bar =
     document.getElementById(
         "progress"
     );
 
 
 
-    if(!progress){
+    if(!bar){
 
         return;
 
@@ -640,27 +793,19 @@ function initProgress(){
 
 
 
-    player.audio
+    musicPlayer.audio
     .addEventListener(
         "timeupdate",
         ()=>{
 
 
-            if(
-                player.audio.duration
-            ){
+            bar.value =
 
-
-                progress.value =
-
-                player.audio.currentTime
-                /
-                player.audio.duration
-                *
-                100;
-
-
-            }
+            musicPlayer.audio.currentTime
+            /
+            musicPlayer.audio.duration
+            *
+            100;
 
 
         }
@@ -668,27 +813,17 @@ function initProgress(){
 
 
 
-
-
-    progress.oninput =
+    bar.oninput =
     ()=>{
 
 
-        if(
-            player.audio.duration
-        ){
+        musicPlayer.audio.currentTime =
 
-
-            player.audio.currentTime =
-
-            progress.value
-            /
-            100
-            *
-            player.audio.duration;
-
-
-        }
+        bar.value
+        /
+        100
+        *
+        musicPlayer.audio.duration;
 
 
     };
@@ -707,181 +842,61 @@ function initProgress(){
 /*
 ================================================
 
-UI更新
-
-================================================
-*/
-
-
-function updatePlayerUI(){
-
-
-
-    const title =
-    document.getElementById(
-        "song-title"
-    );
-
-
-
-    const artist =
-    document.getElementById(
-        "song-artist"
-    );
-
-
-
-    if(title){
-
-
-        title.innerText =
-        player.currentMusic.name;
-
-
-    }
-
-
-
-    if(artist){
-
-
-        artist.innerText =
-        "Unknown";
-
-
-    }
-
-
-
-}
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
-自动播放下一首
-
-无缝切歌接口预留
-
-================================================
-*/
-
-
-player.audio
-.addEventListener(
-    "ended",
-    ()=>{
-
-
-        nextMusic();
-
-
-    }
-);
-
-
-
-
-
-
-
-
-
-/*
-================================================
-
 初始化
 
 ================================================
 */
 
 
-export async function initMusic(){
+export function initMusic(){
 
 
 
-    const folderButton =
-    document.getElementById(
+    document
+    .getElementById(
         "select-music-folder"
+    )
+    ?.addEventListener(
+        "click",
+        chooseFolder
     );
 
 
 
-    const playButton =
-    document.getElementById(
+    document
+    .getElementById(
         "play-button"
+    )
+    ?.addEventListener(
+        "click",
+        toggle
     );
 
 
 
-    const nextButton =
-    document.getElementById(
+    document
+    .getElementById(
         "next-song"
+    )
+    ?.addEventListener(
+        "click",
+        next
     );
 
 
 
-    const previousButton =
-    document.getElementById(
+    document
+    .getElementById(
         "previous-song"
+    )
+    ?.addEventListener(
+        "click",
+        previous
     );
-
-
-
-
-    if(folderButton){
-
-
-        folderButton.onclick =
-        selectMusicFolder;
-
-
-    }
-
-
-
-    if(playButton){
-
-
-        playButton.onclick =
-        togglePlay;
-
-
-    }
-
-
-
-    if(nextButton){
-
-
-        nextButton.onclick =
-        nextMusic;
-
-
-    }
-
-
-
-    if(previousButton){
-
-
-        previousButton.onclick =
-        previousMusic;
-
-
-    }
 
 
 
     initProgress();
-
 
 
 }
@@ -894,25 +909,14 @@ export async function initMusic(){
 
 
 
-/*
-================================================
-
-导出
-
-================================================
-*/
-
-
 export {
 
+    musicPlayer,
 
-    player,
+    play,
 
-    playMusic,
+    next,
 
-    nextMusic,
-
-    previousMusic
-
+    previous
 
 };
