@@ -1,0 +1,759 @@
+/*
+================================================
+
+LXY SPACE
+
+External Random Quote System
+
+外部随机句子系统
+
+================================================
+*/
+
+
+import {
+
+    addData,
+    getAllData,
+    STORES
+
+} from "./storage.js";
+
+
+
+
+
+let config = null;
+
+let currentQuote = null;
+
+
+
+
+
+
+/*
+================================================
+
+加载接口配置
+
+来自:
+
+data/quotes.json
+
+================================================
+*/
+
+
+async function loadConfig(){
+
+
+    const response =
+    await fetch(
+        "./data/quotes.json"
+    );
+
+
+    config =
+    await response.json();
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+================================================
+
+随机选择接口
+
+================================================
+*/
+
+
+function chooseSource(){
+
+
+
+    const sources =
+    config.sources.filter(
+        source =>
+        source.enabled
+    );
+
+
+
+    if(
+        sources.length===0
+    ){
+
+        throw new Error(
+            "No quote API enabled"
+        );
+
+    }
+
+
+
+    const index =
+    Math.floor(
+        Math.random()
+        *
+        sources.length
+    );
+
+
+
+    return sources[index];
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+================================================
+
+请求中文接口
+
+例如 Hitokoto
+
+================================================
+*/
+
+
+async function fetchChinese(
+    source
+){
+
+
+    const response =
+    await fetch(
+        source.url
+    );
+
+
+    const data =
+    await response.json();
+
+
+
+    return {
+
+        text:
+        data.hitokoto
+        ||
+        data.text
+        ||
+        "",
+
+
+        author:
+        data.from
+        ||
+        data.author
+        ||
+        "Unknown",
+
+
+        language:
+        "中文",
+
+
+        translation:
+        null
+
+    };
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+================================================
+
+请求英文接口
+
+例如 Quotable
+
+================================================
+*/
+
+
+async function fetchEnglish(
+    source
+){
+
+
+    const response =
+    await fetch(
+        source.url
+    );
+
+
+    const data =
+    await response.json();
+
+
+
+    return {
+
+
+        text:
+        data.content
+        ||
+        data.text
+        ||
+        "",
+
+
+
+        author:
+        data.author
+        ||
+        "Unknown",
+
+
+
+        language:
+        "English",
+
+
+
+        translation:
+        null
+
+
+
+    };
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+================================================
+
+外部翻译接口
+
+这里不内置翻译
+
+以后可换：
+
+Google Translate API
+
+DeepL API
+
+LibreTranslate
+
+其他兼容接口
+
+================================================
+*/
+
+
+async function translateText(
+    text,
+    from,
+    to="zh"
+){
+
+
+    if(
+        !config.translation.enabled
+    ){
+
+        return null;
+
+    }
+
+
+
+    try{
+
+
+        const api =
+        config.translation.url;
+
+
+
+        const response =
+        await fetch(
+            api,
+            {
+
+
+                method:
+                "POST",
+
+
+                headers:
+                {
+
+
+                    "Content-Type":
+                    "application/json"
+
+
+                },
+
+
+                body:
+                JSON.stringify(
+                    {
+
+
+                        q:text,
+
+
+                        source:from,
+
+
+                        target:to
+
+
+                    }
+                )
+
+
+            }
+        );
+
+
+
+        const data =
+        await response.json();
+
+
+
+        return (
+
+            data.translatedText
+            ||
+            data.translation
+            ||
+            null
+
+        );
+
+
+
+    }
+
+
+    catch(error){
+
+
+        console.warn(
+            "Translation failed",
+            error
+        );
+
+
+        return null;
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+================================================
+
+生成随机句子
+
+================================================
+*/
+
+
+export async function generateQuote(){
+
+
+
+    try{
+
+
+        const source =
+        chooseSource();
+
+
+
+        let quote;
+
+
+
+        if(
+            source.type==="chinese"
+        ){
+
+
+            quote =
+            await fetchChinese(
+                source
+            );
+
+
+        }
+
+
+
+        else if(
+            source.type==="english"
+        ){
+
+
+            quote =
+            await fetchEnglish(
+                source
+            );
+
+
+        }
+
+
+
+        else{
+
+
+            throw new Error(
+                "Unknown quote type"
+            );
+
+
+        }
+
+
+
+
+        if(
+            quote.language!=="中文"
+        ){
+
+
+            quote.translation =
+            await translateText(
+                quote.text,
+                quote.language
+            );
+
+
+        }
+
+
+
+
+        currentQuote =
+        {
+
+
+            ...quote,
+
+
+            time:
+            Date.now()
+
+
+        };
+
+
+
+
+        displayQuote(
+            currentQuote
+        );
+
+
+
+
+    }
+
+
+    catch(error){
+
+
+        console.error(
+            error
+        );
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+================================================
+
+显示
+
+================================================
+*/
+
+
+function displayQuote(
+    quote
+){
+
+
+    const text =
+    document.getElementById(
+        "quote-text"
+    );
+
+
+
+    const info =
+    document.getElementById(
+        "quote-info"
+    );
+
+
+
+    if(text){
+
+
+        text.innerText =
+        quote.text;
+
+
+    }
+
+
+
+
+    if(info){
+
+
+
+        info.innerHTML = `
+
+        ${quote.author}
+
+        ·
+
+        ${quote.language}
+
+
+        ${
+            quote.translation
+            ?
+            "<br>"
+            +
+            quote.translation
+            :
+            ""
+        }
+
+        `;
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+================================================
+
+收藏
+
+================================================
+*/
+
+
+async function favoriteQuote(){
+
+
+
+    if(
+        !currentQuote
+    ){
+
+        return;
+
+    }
+
+
+
+    await addData(
+        STORES.quotes,
+        currentQuote
+    );
+
+
+
+    const button =
+    document.getElementById(
+        "favorite-quote"
+    );
+
+
+
+    if(button){
+
+
+        button.innerHTML =
+        `
+
+        <i class="fa-solid fa-heart"></i>
+
+        已收藏
+
+        `;
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+================================================
+
+初始化事件
+
+================================================
+*/
+
+
+function bindEvents(){
+
+
+
+    const randomButton =
+    document.getElementById(
+        "new-quote"
+    );
+
+
+
+    const favoriteButton =
+    document.getElementById(
+        "favorite-quote"
+    );
+
+
+
+    if(randomButton){
+
+
+        randomButton.onclick =
+        generateQuote;
+
+
+    }
+
+
+
+    if(favoriteButton){
+
+
+        favoriteButton.onclick =
+        favoriteQuote;
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+================================================
+
+模块初始化
+
+================================================
+*/
+
+
+export async function initQuotes(){
+
+
+
+    await loadConfig();
+
+
+
+    bindEvents();
+
+
+
+    await generateQuote();
+
+
+
+}
