@@ -1,40 +1,139 @@
 /*
 ================================================
 
-bieudhbswot22-splace21676816
+Private Space
 
-Equalizer System
-
-Web Audio API
+Equalizer
 
 ================================================
 */
 
 
-let audioContext = null;
-
-let sourceNode = null;
-
-let filters = [];
-
-let initialized = false;
+let filters=[];
 
 
 
+const bands=[
+
+60,
+
+170,
+
+310,
+
+600,
+
+1000,
+
+3000,
+
+6000,
+
+12000
+
+];
 
 
 
 
 
 
-/*
-================================================
 
-频段设置
 
-================================================
-*/
 
+export function createEQ(
+context
+){
+
+
+    filters =
+    bands.map(
+        freq=>{
+
+
+            const filter =
+            context
+            .createBiquadFilter();
+
+
+
+            filter.type =
+            "peaking";
+
+
+
+            filter.frequency.value =
+            freq;
+
+
+
+            filter.gain.value =
+            0;
+
+
+
+            filter.Q.value =
+            1;
+
+
+
+            return filter;
+
+
+        }
+    );
+
+
+
+    return filters;
+
+
+}
+
+
+
+
+
+
+
+
+
+export function setBand(
+index,
+value
+){
+
+
+    if(
+        filters[index]
+    ){
+
+
+        filters[index]
+        .gain.value =
+        value;
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+export function getBands(){
+
+
+    return bands;
+
+
+}
 
 const BANDS = [
 
