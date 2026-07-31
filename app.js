@@ -3,38 +3,411 @@
 
 bieudhbswot22-splace21676816
 
-Main Application Controller
+Main Application
+
+应用入口
 
 ================================================
 */
 
 
-
 import {
 
-    initStorage
-
-} from "./modules/storage.js";
-
-
-import {
-
-    initQuotes
+    init as initQuotes
 
 } from "./modules/quotes.js";
 
 
 import {
 
-    initMusic
+    init as initMusic
 
 } from "./modules/music.js";
 
 
+import {
+
+    init as initGames
+
+} from "./modules/games.js";
 
 
-// 后续添加
+import {
 
+    init as initDiary
+
+} from "./modules/diary.js";
+
+
+import {
+
+    init as initTodo
+
+} from "./modules/todo.js";
+
+
+import {
+
+    init as initCountdown
+
+} from "./modules/countdown.js";
+
+
+import {
+
+    init as initGallery
+
+} from "./modules/gallery.js";
+
+
+import {
+
+    init as initAI
+
+} from "./modules/ai.js";
+
+
+
+
+
+
+
+
+const modules=[
+
+
+
+    {
+
+        name:"quotes",
+
+        init:initQuotes
+
+    },
+
+
+    {
+
+        name:"music",
+
+        init:initMusic
+
+    },
+
+
+    {
+
+        name:"games",
+
+        init:initGames
+
+    },
+
+
+    {
+
+        name:"diary",
+
+        init:initDiary
+
+    },
+
+
+    {
+
+        name:"todo",
+
+        init:initTodo
+
+    },
+
+
+    {
+
+        name:"countdown",
+
+        init:initCountdown
+
+    },
+
+
+    {
+
+        name:"gallery",
+
+        init:initGallery
+
+    },
+
+
+    {
+
+        name:"ai",
+
+        init:initAI
+
+    }
+
+
+
+];
+
+
+
+
+
+
+
+
+
+async function boot(){
+
+
+
+    console.log(
+        "Private Space Starting..."
+    );
+
+
+
+    for(
+        const module
+        of modules
+    ){
+
+
+
+        try{
+
+
+            await module.init();
+
+
+
+            console.log(
+
+                module.name
+                +
+                " loaded"
+
+            );
+
+
+
+        }
+
+
+        catch(error){
+
+
+            console.error(
+
+                module.name
+                +
+                " failed:",
+
+                error
+
+            );
+
+
+        }
+
+
+    }
+
+
+
+    initTheme();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function initTheme(){
+
+
+
+    const saved =
+    localStorage.getItem(
+        "theme"
+    );
+
+
+
+    if(saved){
+
+
+        document.body
+        .dataset.theme =
+        saved;
+
+
+    }
+
+
+
+
+    const button =
+    document.getElementById(
+        "theme-toggle"
+    );
+
+
+
+    if(button){
+
+
+        button.onclick =
+        ()=>{
+
+
+            const current =
+            document.body
+            .dataset.theme
+            ||
+            "light";
+
+
+
+            const next =
+            current==="light"
+            ?
+            "dark"
+            :
+            "light";
+
+
+
+            document.body
+            .dataset.theme =
+            next;
+
+
+
+            localStorage.setItem(
+                "theme",
+                next
+            );
+
+
+
+        };
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function initNavigation(){
+
+
+
+    const buttons =
+    document.querySelectorAll(
+        "[data-page]"
+    );
+
+
+
+    buttons.forEach(
+        button=>{
+
+
+            button.onclick=
+            ()=>{
+
+
+                const page =
+                button.dataset.page;
+
+
+
+                document
+                .querySelectorAll(
+                    ".page"
+                )
+                .forEach(
+                    section=>{
+
+
+                        section.style.display=
+                        "none";
+
+
+                    }
+                );
+
+
+
+                const target =
+                document.getElementById(
+                    page
+                );
+
+
+
+                if(target){
+
+
+                    target.style.display=
+                    "block";
+
+
+                }
+
+
+            };
+
+
+        }
+    );
+
+
+}
+
+
+
+
+
+
+
+
+
+document.addEventListener(
+
+    "DOMContentLoaded",
+
+    ()=>{
+
+
+        initNavigation();
+
+
+        boot();
+
+
+    }
+
+);
 // import { initGames } from "./modules/games.js";
 // import { initDiary } from "./modules/diary.js";
 // import { initGallery } from "./modules/gallery.js";
