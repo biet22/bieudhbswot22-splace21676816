@@ -1,27 +1,24 @@
 <!DOCTYPE html>
+
 <html lang="zh-CN">
+
 
 <head>
 
+
 <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width,initial-scale=1.0">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
 <title>
-bieudhbswot22-splace21676816
+Private Space
 </title>
 
 
+
 <link rel="stylesheet" href="style.css">
-
-
-<!-- 图标库 -->
-
-<link
-rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 
 </head>
@@ -32,63 +29,20 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 <body>
 
 
-<!-- =====================
-顶部导航
-===================== -->
-
-
 <header class="top-bar">
 
 
 <h1>
-✦ My Space
+Private Space
 </h1>
-
-
-
-<nav>
-
-
-<button data-page="home">
-首页
-</button>
-
-
-<button data-page="music">
-音乐
-</button>
-
-
-<button data-page="games">
-游戏
-</button>
-
-
-<button data-page="diary">
-记录
-</button>
-
-
-<button data-page="gallery">
-展览
-</button>
-
-
-<button data-page="ai">
-AI
-</button>
 
 
 
 <button id="theme-toggle">
 
-<i class="fa-solid fa-moon"></i>
+🌙
 
 </button>
-
-
-
-</nav>
 
 
 </header>
@@ -97,513 +51,87 @@ AI
 
 
 
+<nav class="navigation">
 
 
-<!-- =====================
-主页
-===================== -->
+<button data-page="home">
 
-
-<section
-class="page active"
-id="home-page">
-
-
-
-<div class="hero">
-
-
-<h2>
-Welcome
-</h2>
-
-
-<p>
-你的私人数字空间
-</p>
-
-
-</div>
-
-
-
-
-
-<div class="quote-box">
-
-
-<h3>
-随机句子
-</h3>
-
-
-
-<div id="quote-text">
-
-加载中...
-
-</div>
-
-
-
-<div id="quote-info">
-
-</div>
-
-
-
-
-<div class="quote-buttons">
-
-
-<button id="new-quote">
-
-随机
+首页
 
 </button>
 
 
+<button data-page="music-page">
 
-<button id="favorite-quote">
-
-收藏
-
-</button>
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-<div class="shortcut-grid">
-
-
-<button data-goto="music">
-
-🎵 音乐
+音乐
 
 </button>
 
 
-<button data-goto="games">
+<button data-page="game-page">
 
-🎮 游戏
-
-</button>
-
-
-<button data-goto="diary">
-
-📓 记录
-
-</button>
-
-
-<button data-goto="gallery">
-
-🖼 展览
-
-</button>
-
-
-<button data-goto="ai">
-
-🤖 AI
-
-</button>
-
-
-
-</div>
-
-
-
-</section>
-
-
-
-
-
-
-
-
-
-<!-- =====================
-音乐页面
-===================== -->
-
-
-<section
-class="page"
-id="music-page">
-
-
-
-<div class="music-layout">
-
-
-
-
-
-<div class="album-area">
-
-
-<img
-id="album-cover"
-src=""
-alt="cover">
-
-
-
-<h2 id="song-title">
-
-No Music
-
-</h2>
-
-
-
-<p id="song-artist">
-
-Unknown
-
-</p>
-
-
-</div>
-
-
-
-
-
-
-
-<div class="player-control">
-
-
-<button id="select-music-folder">
-
-选择音乐文件夹
-
-</button>
-
-
-
-<div class="buttons">
-
-
-<button id="previous-song">
-
-<i class="fa-solid fa-backward"></i>
-
-</button>
-
-
-<button id="play-button">
-
-<i class="fa-solid fa-play"></i>
-
-</button>
-
-
-<button id="next-song">
-
-<i class="fa-solid fa-forward"></i>
-
-</button>
-
-
-</div>
-
-
-
-
-
-<input
-id="progress"
-type="range"
-min="0"
-max="100"
-value="0">
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div id="music-list">
-
-
-</div>
-
-
-
-
-
-
-
-<!-- 歌词区域 -->
-
-<div class="lyrics-box">
-
-
-<h3>
-Lyrics
-</h3>
-
-
-
-<div id="lyrics-container">
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-<!-- 均衡器 -->
-
-<div class="equalizer-box">
-
-
-<h3>
-Equalizer
-</h3>
-
-
-
-<div class="eq-sliders">
-
-
-
-<input
-type="range"
-class="eq-band"
-min="-12"
-max="12"
-value="0">
-
-
-
-<input
-type="range"
-class="eq-band"
-min="-12"
-max="12"
-value="0">
-
-
-
-<input
-type="range"
-class="eq-band"
-min="-12"
-max="12"
-value="0">
-
-
-
-<input
-type="range"
-class="eq-band"
-min="-12"
-max="12"
-value="0">
-
-
-
-<input
-type="range"
-class="eq-band"
-min="-12"
-max="12"
-value="0">
-
-
-
-<input
-type="range"
-class="eq-band"
-min="-12"
-max="12"
-value="0">
-
-
-
-</div>
-
-
-</div>
-
-
-
-
-</div>
-
-
-</section>
-
-
-
-
-
-
-
-
-
-<!-- =====================
 游戏
-===================== -->
+
+</button>
 
 
-<section
-class="page"
-id="games-page">
+<button data-page="record-page">
 
-
-
-<h2>
-游戏区
-</h2>
-
-
-
-<div class="game-placeholder">
-
-
-未来：
-
-2048
-
-宠物
-
-跑酷
-
-涂鸦
-
-
-</div>
-
-
-
-</section>
-
-
-
-
-
-
-
-
-
-<!-- =====================
 记录
-===================== -->
+
+</button>
 
 
-<section
-class="page"
-id="diary-page">
+<button data-page="gallery-page">
 
-
-
-<h2>
-记录
-</h2>
-
-
-
-<div class="placeholder">
-
-日记 / 待办 / 倒计时
-
-</div>
-
-
-</section>
-
-
-
-
-
-
-
-
-
-<!-- =====================
 展览
-===================== -->
+
+</button>
 
 
-<section
-class="page"
-id="gallery-page">
+<button data-page="ai-page">
 
-
-<h2>
-个人展览
-</h2>
-
-
-<div class="placeholder">
-
-图片 / 视频 / 音乐收藏
-
-</div>
-
-
-</section>
-
-
-
-
-
-
-
-
-
-<!-- =====================
 AI
-===================== -->
+
+</button>
+
+
+
+</nav>
+
+
+
+
+
+
+
+<main>
+
+
+
+
 
 
 <section
-class="page"
-id="ai-page">
+
+id="home"
+
+class="page">
 
 
 <h2>
-AI Assistant
+
+欢迎回来
+
 </h2>
 
 
-<div class="placeholder">
 
-OpenAI接口
+<div id="quote-container">
+
 
 </div>
+
 
 
 </section>
@@ -615,12 +143,271 @@ OpenAI接口
 
 
 
-<script type="module"
+
+<section
+
+id="music-page"
+
+class="page"
+
+style="display:none;">
+
+
+
+<h2>
+
+音乐播放器
+
+</h2>
+
+
+
+<div id="music-container">
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section
+
+id="game-page"
+
+class="page"
+
+style="display:none;">
+
+
+
+<h2>
+
+游戏空间
+
+</h2>
+
+
+
+<div id="game-menu">
+
+</div>
+
+
+
+<div id="game-container">
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section
+
+id="record-page"
+
+class="page"
+
+style="display:none;">
+
+
+
+<h2>
+
+记录
+
+</h2>
+
+
+
+
+<div id="diary-container">
+
+</div>
+
+
+
+<hr>
+
+
+<div id="todo-container">
+
+</div>
+
+
+
+<hr>
+
+
+<div id="countdown-container">
+
+</div>
+
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section
+
+id="gallery-page"
+
+class="page"
+
+style="display:none;">
+
+
+
+<h2>
+
+个人展览
+
+</h2>
+
+
+
+<div id="gallery-container">
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section
+
+id="ai-page"
+
+class="page"
+
+style="display:none;">
+
+
+
+<h2>
+
+AI Assistant
+
+</h2>
+
+
+
+<div id="ai-container">
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+</main>
+
+
+
+
+
+
+
+
+<footer class="music-bar">
+
+
+<div id="now-playing">
+
+
+未播放音乐
+
+
+</div>
+
+
+
+<div class="music-controls">
+
+
+<button>
+
+上一首
+
+</button>
+
+
+<button>
+
+▶
+
+</button>
+
+
+<button>
+
+下一首
+
+</button>
+
+
+</div>
+
+
+
+</footer>
+
+
+
+
+
+
+
+
+<script
+
+type="module"
+
 src="app.js">
+
 </script>
+
 
 
 </body>
 
 
-    </html>
+</html>
